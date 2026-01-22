@@ -1,40 +1,36 @@
-using System;
-using System.Runtime.InteropServices;
-using System.Windows.Input;
-
-namespace CustomSearchApp
+// HotkeyManager.cs - debug version
+public class HotkeyManager
 {
-    public class HotkeyManager
+    [DllImport("user32.dll")]
+    private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
+    
+    [DllImport("user32.dll")]
+    private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+    
+    public void Register(IntPtr windowHandle)
     {
-        [DllImport("user32.dll")]
-        private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
-
-        [DllImport("user32.dll")]
-        private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
-
-        private const int HOTKEY_ID = 9000;
-        private IntPtr _windowHandle;
-
-        public void Register(IntPtr windowHandle)
+        try
         {
-            _windowHandle = windowHandle;
+            // Alt = 0x0001, Space = 0x20 (VK_SPACE)
+            bool success = RegisterHotKey(windowHandle, 1, 0x0001, 0x20);
             
-            // Alt+Space = MOD_ALT (0x0001) + VK_SPACE (0x20)
-            uint modifier = 0x0001; // Alt
-            uint vk = 0x20; // Space
-            
-            if (!RegisterHotKey(_windowHandle, HOTKEY_ID, modifier, vk))
+            if (!success)
             {
-                throw new Exception("Nie udało się zarejestrować hotkeya");
+                // Spróbuj z Ctrl+Space
+                success = RegisterHotKey(windowHandle, 1, 0x0002, 0x20);
+                
+                if (!success)
+                {
+                    // Spróbuj z Win+Space
+                    success = RegisterHotKey(windowHandle, 1, 0x0008, 0x20);
+                }
             }
+            
+            Console.WriteLine($"Hotkey registration: {success}");
         }
-
-        public void Unregister()
+        catch (Exception ex)
         {
-            if (_windowHandle != IntPtr.Zero)
-            {
-                UnregisterHotKey(_windowHandle, HOTKEY_ID);
-            }
+            Console.WriteLine($"Hotkey error: {ex.Message}");
         }
     }
 }
