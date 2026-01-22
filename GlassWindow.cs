@@ -1,93 +1,71 @@
+// GlassWindow.cs - ulepszona wersja
 using System;
 using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Media;
 
-namespace CustomSearchApp
+public class GlassWindow : Window
 {
-    public class GlassWindow : Window
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
+    
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmExtendFrameIntoClientArea(IntPtr hWnd, ref MARGINS pMargins);
+    
+    private const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
+    private const int DWMWA_MICA_EFFECT = 1029;
+    private const int DWMWA_SYSTEMBACKDROP_TYPE = 38;
+    
+    private enum DWM_SYSTEMBACKDROP_TYPE
     {
-        public GlassWindow()
+        DWMSBT_AUTO = 0,
+        DWMSBT_NONE = 1,
+        DWMSBT_MAINWINDOW = 2,
+        DWMSBT_TRANSIENTWINDOW = 3,
+        DWMSBT_TABBEDWINDOW = 4
+    }
+    
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MARGINS
+    {
+        public int cxLeftWidth;
+        public int cxRightWidth;
+        public int cyTopHeight;
+        public int cyBottomHeight;
+    }
+    
+    protected override void OnSourceInitialized(EventArgs e)
+    {
+        base.OnSourceInitialized(e);
+        
+        try
         {
-            // Podstawowe ustawienia
-            WindowStyle = WindowStyle.None;
-            AllowsTransparency = true;
-            Background = Brushes.Transparent;
-            Topmost = true;
+            var hwnd = new WindowInteropHelper(this).Handle;
             
-            // Obsługa klawiszy
-            PreviewKeyDown += (s, e) =>
+            // Ustaw ciemny tryb
+            int darkMode = 1;
+            DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, ref darkMode, sizeof(int));
+            
+            // Wyłącz systemowe tło
+            int backdropType = (int)DWM_SYSTEMBACKDROP_TYPE.DWMSBT_NONE;
+            DwmSetWindowAttribute(hwnd, DWMWA_SYSTEMBACKDROP_TYPE, ref backdropType, sizeof(int));
+            
+            // Rozszerz ramkę do klienta dla przezroczystości
+            var margins = new MARGINS
             {
-                if (e.Key == Key.Escape) Hide();
+                cxLeftWidth = -1,
+                cxRightWidth = -1,
+                cyTopHeight = -1,
+                cyBottomHeight = -1
             };
-            
-            // Auto-hide
-            Deactivated += (s, e) => Hide();
+            DwmExtendFrameIntoClientArea(hwnd, ref margins);
         }
-        
-        protected override void OnSourceInitialized(EventArgs e)
+        catch
         {
-            base.OnSourceInitialized(e);
-            
-            // Włącz acrylic blur po inicjalizacji okna
-            EnableAcrylicBlur();
-        }
-        
-        private void EnableAcrylicBlur()
-        {
-            var windowHelper = new WindowInteropHelper(this);
-            
-            // Jeśli handle jest dostępny, użyj acrylic
-            if (windowHelper.Handle != IntPtr.Zero)
-            {
-                var accent = new AccentPolicy();
-                accent.AccentState = AccentState.ACCENT_ENABLE_ACRYLICBLURBEHIND;
-                accent.GradientColor = 0x99000000; // Półprzezroczyste czarne tło
-                
-                var accentStructSize = Marshal.SizeOf(accent);
-                var accentPtr = Marshal.AllocHGlobal(accentStructSize);
-                Marshal.StructureToPtr(accent, accentPtr, false);
-                
-                var data = new WindowCompositionAttributeData();
-                data.Attribute = WindowCompositionAttribute.WCA_ACCENT_POLICY;
-                data.SizeOfData = accentStructSize;
-                data.Data = accentPtr;
-                
-                SetWindowCompositionAttribute(windowHelper.Handle, ref data);
-                Marshal.FreeHGlobal(accentPtr);
-            }
-        }
-        
-        [DllImport("user32.dll")]
-        internal static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);
-        
-        internal enum AccentState
-        {
-            ACCENT_ENABLE_ACRYLICBLURBEHIND = 4
-        }
-        
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct AccentPolicy
-        {
-            public AccentState AccentState;
-            public int AccentFlags;
-            public int GradientColor;
-            public int AnimationId;
-        }
-        
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct WindowCompositionAttributeData
-        {
-            public WindowCompositionAttribute Attribute;
-            public IntPtr Data;
-            public int SizeOfData;
-        }
-        
-        internal enum WindowCompositionAttribute
-        {
-            WCA_ACCENT_POLICY = 19
+            // Fallback: ustaw przezroczystość
+            AllowsTransparency = true;
+            WindowStyle = WindowStyle.None;
+            Background = System.Windows.Media.Brushes.Transparent;
         }
     }
 }
