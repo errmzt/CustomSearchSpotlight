@@ -98,3 +98,61 @@ namespace CustomSearchApp
         }
     }
 }
+// W WindowsSearchService.cs dodaj metodę:
+public async Task<List<FileSearchResult>> SearchByKindAsync(string query, string kind, int maxResults = 20)
+{
+    var results = new List<FileSearchResult>();
+    
+    try
+    {
+        using (var connection = new OleDbConnection(ConnectionString))
+        {
+            await connection.OpenAsync();
+            
+            string sqlQuery = @"
+                SELECT 
+                    System.ItemName, 
+                    System.ItemPathDisplay, 
+                    System.ItemTypeText,
+                    System.Size,
+                    System.DateModified,
+                    System.Kind
+                FROM SYSTEMINDEX
+                WHERE (CONTAINS(System.ItemName, '""*" + query + "*""') 
+                    OR CONTAINS(System.ItemPathDisplay, '""*" + query + "*""'))
+                    AND System.Kind = @kind
+                ORDER BY System.DateModified DESC";
+
+            using (var command = new OleDbCommand(sqlQuery, connection))
+            {
+                command.Parameters.AddWithValue("@kind", kind);
+                
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    int count = 0;
+                    while (await reader.ReadAsync() && count < maxResults)
+                    {
+                        var result = new FileSearchResult
+                        {
+                            Name = reader["System.ItemName"]?.ToString() ?? "Unknown",
+                            Path = reader["System.ItemPathDisplay"]?.ToString() ?? "",
+                            Type = reader["System.ItemTypeText"]?.ToString() ?? "File",
+                            Size = Convert.ToInt64(reader["System.Size"] ?? 0),
+                            Modified = Convert.ToDateTime(reader["System.DateModified"] ?? DateTime.MinValue),
+                            Kind = reader["System.Kind"]?.ToString() ?? ""
+                        };
+                        
+                        results.Add(result);
+                        count++;
+                    }
+                }
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Windows Search by kind error: {ex.Message}");
+    }
+    
+    return results;
+}
