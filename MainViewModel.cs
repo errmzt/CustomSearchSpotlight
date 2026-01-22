@@ -1,140 +1,68 @@
 using System;
-using System.Collections.ObjectModel;
-using System.Windows.Input;
-using CustomSearchSpotlight.Models;
-using CustomSearchSpotlight.Services;
+using System.Windows;
+using System.Windows.Interop;
 
-namespace CustomSearchSpotlight.ViewModels
+namespace CustomSearchApp
 {
-    public class MainViewModel : ViewModelBase
+    public partial class MainWindow : GlassWindow
     {
-        private string _searchQuery;
-        private bool _showSearchHint = true;
-        private ObservableCollection<SearchResult> _searchResults;
-        private SearchResult _selectedResult;
-        private readonly ISearchService _searchService;
-        private readonly IAIService _aiService;
-
-        public MainViewModel()
+        private HotkeyManager _hotkeyManager;
+        
+        public MainWindow()
         {
-            _searchService = new WindowsSearchService();
-            _aiService = new GeminiService("YOUR_API_KEY"); // Replace with your API key
-            SearchResults = new ObservableCollection<SearchResult>();
-            ExecuteSearchCommand = new RelayCommand(ExecuteSearch);
+            InitializeComponent();
+            SetupHotkey();
         }
-
-        public string SearchQuery
+        
+        private void SetupHotkey()
         {
-            get => _searchQuery;
-            set
-            {
-                _searchQuery = value;
-                OnPropertyChanged();
-                ShowSearchHint = string.IsNullOrEmpty(value);
-                // Trigger search as you type
-                ExecuteSearch(null);
-            }
+            _hotkeyManager = new HotkeyManager();
+            
+            // Pokaż okno przy starcie (tylko do testów)
+            Loaded += (s, e) => Show();
         }
-
-        public bool ShowSearchHint
+        
+        protected override void OnSourceInitialized(EventArgs e)
         {
-            get => _showSearchHint;
-            set
-            {
-                _showSearchHint = value;
-                OnPropertyChanged();
-            }
+            base.OnSourceInitialized(e);
+            
+            // Zarejestruj hotkey
+            var windowHelper = new WindowInteropHelper(this);
+            _hotkeyManager.Register(windowHelper.Handle);
+            
+            // Hook dla wiadomości Windows
+            var source = HwndSource.FromHwnd(windowHelper.Handle);
+            source?.AddHook(HwndHook);
         }
-
-        public ObservableCollection<SearchResult> SearchResults
+        
+        private IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            get => _searchResults;
-            set
+            const int WM_HOTKEY = 0x0312;
+            
+            if (msg == WM_HOTKEY && wParam.ToInt32() == 9000) // Nasz hotkey ID
             {
-                _searchResults = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public SearchResult SelectedResult
-        {
-            get => _selectedResult;
-            set
-            {
-                _selectedResult = value;
-                OnPropertyChanged();
-                if (value != null)
+                // Alt+Space został naciśnięty!
+                if (IsVisible)
                 {
-                    // Handle selection
-                    ExecuteResult(value);
+                    Hide();
                 }
-            }
-        }
-
-        public ICommand ExecuteSearchCommand { get; }
-
-        private async void ExecuteSearch(object parameter)
-        {
-            if (string.IsNullOrWhiteSpace(SearchQuery))
-            {
-                SearchResults.Clear();
-                return;
-            }
-
-            var results = await _searchService.SearchAsync(SearchQuery);
-            SearchResults = new ObservableCollection<SearchResult>(results);
-
-            // If no results from local search, you might want to show AI suggestions
-            if (SearchResults.Count == 0)
-            {
-                // Optionally, use AI to generate a response
-                var aiResponse = await _aiService.GetCompletionAsync(SearchQuery);
-                SearchResults.Add(new SearchResult
+                else
                 {
-                    Title = "AI Suggestion",
-                    Description = aiResponse,
-                    Type = ResultType.AI
-                });
+                    Show();
+                    Activate();
+                    Topmost = true;
+                    Focus();
+                }
+                handled = true;
             }
+            
+            return IntPtr.Zero;
         }
-
-        private void ExecuteResult(SearchResult result)
+        
+        protected override void OnClosed(EventArgs e)
         {
-            // Handle opening the result (file, app, etc.)
-            // For now, just a placeholder
-            System.Diagnostics.Process.Start(result.Path);
+            _hotkeyManager.Unregister();
+            base.OnClosed(e);
         }
-    }
-
-    public abstract class ViewModelBase : System.ComponentModel.INotifyPropertyChanged
-    {
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-        }
-    }
-
-    public class RelayCommand : ICommand
-    {
-        private readonly Action<object> _execute;
-        private readonly Func<object, bool> _canExecute;
-
-        public event EventHandler CanExecuteChanged
-        {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
-        }
-
-        public RelayCommand(Action<object> execute, Func<object, bool> canExecute = null)
-        {
-            _execute = execute;
-            _canExecute = canExecute;
-        }
-
-        public bool CanExecute(object parameter) => _canExecute == null || _canExecute(parameter);
-
-        public void Execute(object parameter) => _execute(parameter);
     }
 }
