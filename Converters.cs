@@ -11,3 +11,8 @@ public class BoolToVisibilityConverter : IValueConverter
         return value is Visibility visibility && visibility == Visibility.Visible;
     }
 }
+public interface IAIService
+{
+    Task<string> AskQuestionAsync(string question);
+    Task<bool> TestConnectionAsync();
+}
