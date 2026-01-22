@@ -108,3 +108,116 @@ namespace CustomSearchApp
         }
     }
 }
+public partial class MainWindow : GlassWindow
+{
+    private HotkeyManager _hotkeyManager;
+    private GeminiService _geminiService;
+    private VoiceService _voiceService;
+    private bool _isVoiceActive;
+    
+    public MainWindow()
+    {
+        InitializeComponent();
+        SetupHotkey();
+        SetupGemini();
+        SetupVoice();
+    }
+    
+    private void SetupVoice()
+    {
+        _voiceService = new VoiceService();
+        _voiceService.SpeechRecognized += VoiceService_SpeechRecognized;
+        _voiceService.ListeningStarted += VoiceService_ListeningStarted;
+        _voiceService.ListeningStopped += VoiceService_ListeningStopped;
+        
+        // Start listening in background
+        _voiceService.StartListening();
+        _isVoiceActive = true;
+    }
+    
+    private void VoiceService_SpeechRecognized(object sender, string text)
+    {
+        // Update UI from voice thread
+        Dispatcher.Invoke(() =>
+        {
+            StatusText.Text = $"🎤: {text}";
+            
+            // If it's a question, send to AI
+            if (text.EndsWith("?") || text.Contains("jak") || text.Contains("co to") || 
+                text.Contains("czy") || text.Contains("dlaczego"))
+            {
+                SearchBox.Text = text;
+                _ = AskGeminiAsync(text);
+            }
+        });
+    }
+    
+    private void VoiceService_ListeningStarted(object sender, string message)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            VoiceButton.Content = "🔴";
+            VoiceButton.ToolTip = "Nasłuchiwanie włączone";
+        });
+    }
+    
+    private void VoiceService_ListeningStopped(object sender, EventArgs e)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            VoiceButton.Content = "🎤";
+            VoiceButton.ToolTip = "Nasłuchiwanie wyłączone";
+        });
+    }
+    
+    private void VoiceButton_Click(object sender, RoutedEventArgs e)
+    {
+        _isVoiceActive = !_isVoiceActive;
+        
+        if (_isVoiceActive)
+        {
+            _voiceService.StartListening();
+            _voiceService.Speak("Asystent głosowy włączony");
+        }
+        else
+        {
+            _voiceService.StopListening();
+            _voiceService.Speak("Asystent głosowy wyłączony");
+        }
+    }
+    
+    private async Task AskGeminiAsync(string question)
+    {
+        try
+        {
+            StatusText.Text = "🤔 Gemini myśli...";
+            AiResponseBox.Visibility = Visibility.Visible;
+            AiResponseText.Text = "Proszę czekać...";
+            
+            var response = await _geminiService.AskQuestionAsync(question);
+            
+            AiResponseText.Text = response;
+            StatusText.Text = "✅ Odpowiedź otrzymana";
+            
+            // Speak the response
+            if (_isVoiceActive)
+            {
+                // Truncate long responses for speech
+                var speechText = response.Length > 200 ? 
+                    response.Substring(0, 200) + "..." : response;
+                _voiceService.Speak(speechText);
+            }
+        }
+        catch (Exception ex)
+        {
+            AiResponseText.Text = $"Błąd: {ex.Message}";
+            StatusText.Text = "❌ Wystąpił błąd";
+        }
+    }
+    
+    protected override void OnClosed(EventArgs e)
+    {
+        _voiceService?.Dispose();
+        base.OnClosed(e);
+    }
+}
