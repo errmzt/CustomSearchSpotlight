@@ -223,3 +223,11 @@ namespace CustomSearchApp
         }
     }
 }
+using System.Speech.Recognition;
+var recognizer = new SpeechRecognitionEngine();
+recognizer.LoadGrammar(new DictationGrammar());
+recognizer.SpeechRecognized += (s, e) => {
+    // e.Result.Text - przekaż tekst do pola wyszukiwania
+};
+recognizer.SetInputToDefaultAudioDevice();
+recognizer.RecognizeAsync(RecognizeMode.Multiple);
