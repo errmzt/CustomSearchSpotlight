@@ -13,3 +13,95 @@
         </Style>
     </Application.Resources>
 </Application>
+<Application.Resources>
+    <ResourceDictionary>
+        <ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary Source="Animations.xaml"/>
+        </ResourceDictionary.MergedDictionaries>
+        
+        <!-- Apple Glass Button Style -->
+        <Style x:Key="AppleGlassButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="15,10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <!-- Background Glow -->
+                            <Border x:Name="BackgroundGlow" 
+                                    CornerRadius="20" 
+                                    Background="#10007AFF"
+                                    Opacity="0"
+                                    Margin="-5"/>
+                            
+                            <!-- Main Button -->
+                            <Border x:Name="ButtonBorder" 
+                                    CornerRadius="20" 
+                                    Background="{TemplateBinding Background}"
+                                    BorderThickness="{TemplateBinding BorderThickness}">
+                                <ContentPresenter HorizontalAlignment="Center" 
+                                                  VerticalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background">
+                                    <Setter.Value>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="#20007AFF" Offset="0"/>
+                                            <GradientStop Color="#10007AFF" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="BackgroundGlow" Property="Opacity" Value="1"/>
+                            </Trigger>
+                            <EventTrigger RoutedEvent="PreviewMouseDown">
+                                <BeginStoryboard Storyboard="{StaticResource ButtonPressAnimation}"/>
+                            </EventTrigger>
+                            <EventTrigger RoutedEvent="PreviewMouseUp">
+                                <BeginStoryboard Storyboard="{StaticResource ButtonReleaseAnimation}"/>
+                            </EventTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <!-- Animated Search Box Style -->
+        <Style x:Key="AnimatedSearchBox" TargetType="Border">
+            <Setter Property="CornerRadius" Value="20"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#40000000" Offset="0"/>
+                        <GradientStop x:Name="SearchGradient1" Color="#007AFF" Offset="0.3"/>
+                        <GradientStop x:Name="SearchGradient2" Color="#0A84FF" Offset="0.7"/>
+                        <GradientStop Color="#40000000" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="20" 
+                                      Opacity="0.3" 
+                                      ShadowDepth="0" 
+                                      Color="#007AFF"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+    </ResourceDictionary>
+</Application.Resources>
