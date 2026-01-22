@@ -156,3 +156,41 @@ public async Task<List<FileSearchResult>> SearchByKindAsync(string query, string
     
     return results;
 }
+// Przykładowa, uproszczona implementacja wyszukiwania plików
+public class WindowsSearchService
+{
+    public IEnumerable<SearchResult> SearchFiles(string query, string filter = "*.*")
+    {
+        var results = new List<SearchResult>();
+        // Wyszukiwanie w folderze użytkownika i dyskach systemowych
+        string[] searchPaths = {
+            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            @"C:\Program Files",
+            @"C:\Program Files (x86)"
+        };
+        foreach (var path in searchPaths)
+        {
+            if (Directory.Exists(path))
+            {
+                try
+                {
+                    var files = Directory.EnumerateFiles(path, filter,
+                        SearchOption.AllDirectories)
+                        .Where(f => f.Contains(query, StringComparison.OrdinalIgnoreCase))
+                        .Take(20); // Limit wyników
+                    foreach (var file in files)
+                    {
+                        results.Add(new SearchResult
+                        {
+                            Title = Path.GetFileName(file),
+                            Path = file,
+                            ResultType = SearchResultType.File
+                        });
+                    }
+                }
+                catch { } // Pomijamy niedostępne ścieżki
+            }
+        }
+        return results;
+    }
+}
