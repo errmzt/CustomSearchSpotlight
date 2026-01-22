@@ -111,3 +111,12 @@ namespace CustomSearchApp
         }
     }
 }
+private void AddToStartup()
+{
+    var startupPath = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+    var shortcutPath = System.IO.Path.Combine(startupPath, "CustomSearch Spotlight.lnk");
+    
+    if (!System.IO.File.Exists(shortcutPath))
+    {
+    }
+}
