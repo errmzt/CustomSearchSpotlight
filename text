@@ -1,0 +1,10 @@
+[Glass Window z zaokrągleniami 30px]
+   |
+   ├── [Search Box z pulsującym gradientem #007AFF]
+   │      └── [Pasek animacji 3px pod spodem]
+   │
+   ├── [Voice Animation - 3 fale podczas mówienia]
+   │
+   ├── [Results Panels z fade in/out]
+   │
+   └── [Status Bar z micro-animacjami]
