@@ -1,122 +1,209 @@
 using System;
-using System.Windows;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace CustomSearchApp
 {
-    public partial class MainWindow : GlassWindow
+    public class MainViewModel : INotifyPropertyChanged
     {
-        private HotkeyManager _hotkeyManager;
-        private GeminiService _geminiService;
+        private string _searchQuery;
+        private string _aiResponse;
+        private bool _showAiResponse;
+        private bool _showFileResults;
+        private string _statusText;
         
-        public MainWindow()
-        {
-            InitializeComponent();
-            SetupHotkey();
-            SetupGemini();
-        }
+        private readonly GeminiService _geminiService;
+        private readonly FileSearchService _fileSearchService;
+        private readonly VoiceService _voiceService;
         
-        private void SetupHotkey()
-        {
-            _hotkeyManager = new HotkeyManager();
-        }
+        public ObservableCollection<FileSearchResult> FileResults { get; }
+        public ObservableCollection<object> SearchResults { get; }
         
-        private void SetupGemini()
+        public string SearchQuery
         {
-            // TU WPISZ SWÓJ KLUCZ API GEMINI!
-            string apiKey = "AIzaSyTwojKluczAPIWpiszTutaj";
-            _geminiService = new GeminiService(apiKey);
-        }
-        
-        private async void SearchBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
+            get => _searchQuery;
+            set
             {
-                var question = SearchBox.Text;
-                if (!string.IsNullOrWhiteSpace(question))
-                {
-                    await AskGeminiAsync(question);
-                }
+                _searchQuery = value;
+                OnPropertyChanged();
+                OnSearchQueryChanged(value);
             }
         }
         
-        private async void ExampleButton_Click(object sender, RoutedEventArgs e)
+        public string AiResponse
         {
-            if (sender is Button button && button.Tag is string question)
+            get => _aiResponse;
+            set
             {
-                SearchBox.Text = question;
-                await AskGeminiAsync(question);
+                _aiResponse = value;
+                OnPropertyChanged();
             }
         }
         
-        private async Task AskGeminiAsync(string question)
+        public bool ShowAiResponse
         {
-            try
+            get => _showAiResponse;
+            set
             {
-                StatusText.Text = "🤔 Gemini myśli...";
-                AiResponseBox.Visibility = Visibility.Visible;
-                AiResponseText.Text = "Proszę czekać...";
+                _showAiResponse = value;
+                OnPropertyChanged();
+            }
+        }
+        
+        public bool ShowFileResults
+        {
+            get => _showFileResults;
+            set
+            {
+                _showFileResults = value;
+                OnPropertyChanged();
+            }
+        }
+        
+        public string StatusText
+        {
+            get => _statusText;
+            set
+            {
+                _statusText = value;
+                OnPropertyChanged();
+            }
+        }
+        
+        public ICommand SearchCommand { get; }
+        public ICommand VoiceCommand { get; }
+        public ICommand OpenFileCommand { get; }
+        
+        public MainViewModel()
+        {
+            // Initialize services
+            _geminiService = new GeminiService("YOUR_API_KEY");
+            _fileSearchService = new FileSearchService();
+            _voiceService = new VoiceService();
+            
+            // Initialize collections
+            FileResults = new ObservableCollection<FileSearchResult>();
+            SearchResults = new ObservableCollection<object>();
+            
+            // Initialize commands
+            SearchCommand = new RelayCommand(async () => await ExecuteSearch());
+            VoiceCommand = new RelayCommand(ToggleVoice);
+            OpenFileCommand = new RelayCommand(OpenSelectedFile);
+            
+            // Setup voice events
+            _voiceService.SpeechRecognized += (s, text) =>
+            {
+                SearchQuery = text;
+                _ = ExecuteSearch();
+            };
+            
+            StatusText = "Gotowy - mów lub pisz...";
+        }
+        
+        private async void OnSearchQueryChanged(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                FileResults.Clear();
+                ShowAiResponse = false;
+                ShowFileResults = false;
+                return;
+            }
+            
+            // Show loading
+            StatusText = "Szukam...";
+            
+            // Search files in parallel
+            var fileTask = _fileSearchService.SearchFilesAsync(query, 10);
+            
+            // Check if it's a question for AI
+            var isQuestion = query.Contains("?") || query.Contains("jak") || 
+                            query.Contains("co to") || query.Contains("czy");
+            
+            if (isQuestion)
+            {
+                ShowAiResponse = true;
+                AiResponse = "Myślę...";
                 
-                var response = await _geminiService.AskQuestionAsync(question);
+                var aiTask = _geminiService.AskQuestionAsync(query);
+                await Task.WhenAll(fileTask, aiTask);
                 
-                AiResponseText.Text = response;
-                StatusText.Text = "✅ Odpowiedź otrzymana";
+                AiResponse = aiTask.Result;
+                StatusText = "Znaleziono pliki i odpowiedź AI";
             }
-            catch (Exception ex)
+            else
             {
-                AiResponseText.Text = $"Błąd: {ex.Message}";
-                StatusText.Text = "❌ Wystąpił błąd";
+                await fileTask;
+                ShowAiResponse = false;
+                StatusText = $"Znaleziono {fileTask.Result.Count} plików";
             }
-        }
-        
-        protected override void OnSourceInitialized(EventArgs e)
-        {
-            base.OnSourceInitialized(e);
             
-            var windowHelper = new WindowInteropHelper(this);
-            _hotkeyManager.Register(windowHelper.Handle);
-            
-            var source = HwndSource.FromHwnd(windowHelper.Handle);
-            source?.AddHook(HwndHook);
-        }
-        
-        private IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-        {
-            const int WM_HOTKEY = 0x0312;
-            
-            if (msg == WM_HOTKEY && wParam.ToInt32() == 9000)
+            // Update file results
+            FileResults.Clear();
+            foreach (var file in fileTask.Result)
             {
-                if (IsVisible)
-                {
-                    Hide();
-                }
-                else
-                {
-                    Show();
-                    Activate();
-                    Topmost = true;
-                    SearchBox.Focus();
-                    SearchBox.SelectAll();
-                }
-                handled = true;
+                FileResults.Add(file);
             }
             
-            return IntPtr.Zero;
+            ShowFileResults = FileResults.Count > 0;
         }
         
-        protected override void OnClosed(EventArgs e)
+        private async Task ExecuteSearch()
         {
-            _hotkeyManager.Unregister();
-            base.OnClosed(e);
+            if (string.IsNullOrWhiteSpace(SearchQuery)) return;
+            OnSearchQueryChanged(SearchQuery);
+        }
+        
+        private void ToggleVoice()
+        {
+            if (_voiceService.IsListening)
+            {
+                _voiceService.StopListening();
+                StatusText = "Głos wyłączony";
+            }
+            else
+            {
+                _voiceService.StartListening();
+                StatusText = "Nasłuchiwanie... Mów teraz";
+            }
+        }
+        
+        private void OpenSelectedFile()
+        {
+            // Implementation for opening files
+        }
+        
+        public event PropertyChangedEventHandler PropertyChanged;
+        
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
-}
-private void AddToStartup()
-{
-    var startupPath = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
-    var shortcutPath = System.IO.Path.Combine(startupPath, "CustomSearch Spotlight.lnk");
     
-    if (!System.IO.File.Exists(shortcutPath))
+    // Simple RelayCommand implementation
+    public class RelayCommand : ICommand
     {
+        private readonly Action _execute;
+        private readonly Func<bool> _canExecute;
+        
+        public RelayCommand(Action execute, Func<bool> canExecute = null)
+        {
+            _execute = execute;
+            _canExecute = canExecute;
+        }
+        
+        public bool CanExecute(object parameter) => _canExecute?.Invoke() ?? true;
+        
+        public void Execute(object parameter) => _execute();
+        
+        public event EventHandler CanExecuteChanged
+        {
+            add => CommandManager.RequerySuggested += value;
+            remove => CommandManager.RequerySuggested -= value;
+        }
     }
 }
