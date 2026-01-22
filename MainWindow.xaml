@@ -42,7 +42,16 @@
                              KeyDown="SearchBox_KeyDown"/>
                 </Grid>
             </Border>
-            
+<StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" 
+            VerticalAlignment="Center" Margin="0,0,10,0">
+    <Button x:Name="VoiceButton" 
+            Content="🎤" 
+            Width="40" Height="40"
+            Style="{StaticResource GlassButton}"
+            Click="VoiceButton_Click"
+            ToolTip="Włącz/wyłącz asystenta głosowego"/>
+</StackPanel>
+
             <!-- WYNIKI -->
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                 <StackPanel>
