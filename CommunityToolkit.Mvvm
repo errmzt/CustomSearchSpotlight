@@ -1,0 +1,93 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CustomSearchApp.Services;
+using System;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using System.Windows;
+
+namespace CustomSearchApp.ViewModels
+{
+    public partial class MainViewModel : ObservableObject
+    {
+        private readonly WindowsSearchService _searchService;
+
+        [ObservableProperty]
+        private string _searchQuery = "";
+
+        [ObservableProperty]
+        private bool _isSearching;
+
+        public ObservableCollection<SearchResult> SearchResults { get; } 
+            = new ObservableCollection<SearchResult>();
+
+        public MainViewModel()
+        {
+            _searchService = new WindowsSearchService();
+        }
+
+        // Automatyczne wyszukiwanie przy zmianie zapytania
+        partial void OnSearchQueryChanged(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                SearchResults.Clear();
+                return;
+            }
+            _ = PerformSearchAsync(value);
+        }
+
+        private async Task PerformSearchAsync(string query)
+        {
+            IsSearching = true;
+            SearchResults.Clear();
+
+            try
+            {
+                var results = await _searchService.SearchAsync(query);
+                foreach (var result in results)
+                {
+                    SearchResults.Add(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Błąd wyszukiwania: {ex.Message}");
+            }
+            finally
+            {
+                IsSearching = false;
+            }
+        }
+
+        // Komenda do otwierania wyniku
+        [RelayCommand]
+        private void OpenResult(SearchResult result)
+        {
+            if (result == null) return;
+
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = result.Path,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Nie można otworzyć: {ex.Message}", 
+                    "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // Komenda czyszczenia
+        [RelayCommand]
+        private void ClearSearch()
+        {
+            SearchQuery = "";
+            SearchResults.Clear();
+        }
+    }
+}
