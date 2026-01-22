@@ -1,0 +1,6 @@
+CustomSearchApp/
+├── MainWindow.xaml/.cs     # Main UI window
+├── GlassWindow.cs          # Glass/acrylic effects
+├── HotkeyManager.cs        # Alt+Space hotkey
+├── GeminiService.cs        # Google Gemini AI
+└── appsettings.json        # Configuration
