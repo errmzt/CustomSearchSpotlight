@@ -45,3 +45,64 @@
                 Margin="0,0,0,20" Padding="20,10" Click="SaveButton_Click"/>
     </Grid>
 </Window>
+using System.Windows.Forms;
+
+public class TrayIconManager : IDisposable
+{
+    private NotifyIcon _trayIcon;
+    private Window _mainWindow;
+    
+    public TrayIconManager(Window mainWindow)
+    {
+        _mainWindow = mainWindow;
+        InitializeTrayIcon();
+    }
+    
+    private void InitializeTrayIcon()
+    {
+        _trayIcon = new NotifyIcon();
+        _trayIcon.Icon = System.Drawing.Icon.ExtractAssociatedIcon(System.Windows.Forms.Application.ExecutablePath);
+        _trayIcon.Text = "Custom Search Spotlight";
+        
+        // Menu kontekstowe
+        var menu = new ContextMenuStrip();
+        menu.Items.Add("Otwórz", null, (s, e) => ShowMainWindow());
+        menu.Items.Add("Ustawienia", null, (s, e) => ShowSettings());
+        menu.Items.Add("-");
+        menu.Items.Add("Wyjdź", null, (s, e) => ExitApplication());
+        
+        _trayIcon.ContextMenuStrip = menu;
+        
+        // Kliknięcie na ikonę
+        _trayIcon.Click += (s, e) => 
+        {
+            if (((MouseEventArgs)e).Button == MouseButtons.Left)
+                ShowMainWindow();
+        };
+        
+        _trayIcon.Visible = true;
+    }
+    
+    private void ShowMainWindow()
+    {
+        _mainWindow.Show();
+        _mainWindow.WindowState = WindowState.Normal;
+        _mainWindow.Activate();
+    }
+    
+    private void ShowSettings()
+    {
+        // Otwórz okno ustawień
+    }
+    
+    private void ExitApplication()
+    {
+        _trayIcon.Visible = false;
+        Application.Current.Shutdown();
+    }
+    
+    public void Dispose()
+    {
+        _trayIcon?.Dispose();
+    }
+}
