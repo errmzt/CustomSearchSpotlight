@@ -234,3 +234,98 @@ public class MainViewModel : INotifyPropertyChanged
     
     // ... reszta kodu
 }
+using CustomSearchApp.Services;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
+using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Input;
+
+namespace CustomSearchApp.ViewModels
+{
+    public class MainViewModel : ViewModelBase
+    {
+        private readonly WindowsSearchService _searchService;
+        private string _searchQuery;
+        private bool _isSearching;
+
+        public ObservableCollection<WindowsSearchService.SearchResult> SearchResults { get; }
+        
+        public string SearchQuery
+        {
+            get => _searchQuery;
+            set
+            {
+                Set(ref _searchQuery, value);
+                if (!string.IsNullOrEmpty(value))
+                {
+                    // Opóźnione wyszukiwanie po 300ms od ostatniego wpisania
+                    _ = PerformSearchAsync(value);
+                }
+                else
+                {
+                    SearchResults.Clear();
+                }
+            }
+        }
+        
+        public bool IsSearching
+        {
+            get => _isSearching;
+            set => Set(ref _isSearching, value);
+        }
+        
+        public ICommand OpenResultCommand { get; }
+        public ICommand ClearSearchCommand { get; }
+
+        public MainViewModel()
+        {
+            _searchService = new WindowsSearchService();
+            SearchResults = new ObservableCollection<WindowsSearchService.SearchResult>();
+            
+            OpenResultCommand = new RelayCommand<WindowsSearchService.SearchResult>(OpenResult);
+            ClearSearchCommand = new RelayCommand(ClearSearch);
+        }
+
+        private async Task PerformSearchAsync(string query)
+        {
+            IsSearching = true;
+            SearchResults.Clear();
+
+            var results = await _searchService.SearchAsync(query, 15);
+            
+            foreach (var result in results)
+            {
+                SearchResults.Add(result);
+            }
+            
+            IsSearching = false;
+        }
+
+        private void OpenResult(WindowsSearchService.SearchResult result)
+        {
+            if (result == null) return;
+
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = result.Path,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error opening {result.Path}: {ex.Message}");
+            }
+        }
+
+        private void ClearSearch()
+        {
+            SearchQuery = string.Empty;
+            SearchResults.Clear();
+        }
+    }
+}
