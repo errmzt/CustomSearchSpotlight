@@ -1,0 +1,4 @@
+# Create single executable
+dotnet publish -c Release -r win10-x64 --self-contained true -p:PublishSingleFile=true -o ./dist
+
+# The executable will be in ./dist folder
