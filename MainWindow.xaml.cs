@@ -93,3 +93,40 @@ public void ToggleVisibility()
         </StackPanel>
     </Grid>
 </local:GlassWindow>
+using CustomSearchApp.ViewModels;
+using System.Windows;
+using System.Windows.Input;
+
+namespace CustomSearchApp
+{
+    public partial class MainWindow : GlassWindow
+    {
+        private readonly MainViewModel _viewModel;
+
+        public MainWindow()
+        {
+            InitializeComponent();
+            _viewModel = new MainViewModel();
+            DataContext = _viewModel;
+        }
+
+        // Obsługa kliknięcia na wynik
+        private void Border_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2 && sender is FrameworkElement element)
+            {
+                _viewModel.OpenResultCommand.Execute(element.DataContext);
+            }
+        }
+
+        // Ukrywanie okna po naciśnięciu Esc
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                this.Hide();
+            }
+            base.OnKeyDown(e);
+        }
+    }
+}
