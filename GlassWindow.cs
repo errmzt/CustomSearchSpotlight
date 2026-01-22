@@ -69,3 +69,78 @@ public class GlassWindow : Window
         }
     }
 }
+using System;
+using System.Runtime.InteropServices;
+using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Media;
+
+namespace CustomSearchApp.Windows
+{
+    public class GlassWindow : Window
+    {
+        // Importy funkcji systemowych Windows (DWM)
+        [DllImport("dwmapi.dll")]
+        private static extern int DwmExtendFrameIntoClientArea(IntPtr hWnd, ref MARGINS pMarInset);
+
+        [DllImport("dwmapi.dll")]
+        private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
+
+        // Struktura dla marginesów
+        public struct MARGINS
+        {
+            public int cxLeftWidth;
+            public int cxRightWidth;
+            public int cyTopHeight;
+            public int cyBottomHeight;
+        }
+
+        // Stałe dla efektów DWM
+        private const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
+        private const int DWMWA_SYSTEMBACKDROP_TYPE = 38;
+        private const int DWMSBT_MAINWINDOW = 2; // Wartość dla efektu Acrylic
+
+        public GlassWindow()
+        {
+            // Konfiguracja okna
+            this.WindowStyle = WindowStyle.None;
+            this.AllowsTransparency = true;
+            this.Background = Brushes.Transparent;
+            this.ResizeMode = ResizeMode.CanResizeWithGrip;
+
+            // Zdarzenie załadowania okna
+            this.Loaded += (s, e) => { EnableGlassEffect(); };
+        }
+
+        private void EnableGlassEffect()
+        {
+            var helper = new WindowInteropHelper(this);
+            IntPtr hwnd = helper.Handle;
+
+            // 1. Wymuś ciemny motyw okna
+            int darkMode = 1;
+            DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, ref darkMode, sizeof(int));
+
+            // 2. Włącz efekt Acrylic (szkło)
+            int backdropType = DWMSBT_MAINWINDOW;
+            DwmSetWindowAttribute(hwnd, DWMWA_SYSTEMBACKDROP_TYPE, ref backdropType, sizeof(int));
+
+            // 3. Rozciągnij ramkę na całe okno (dla przezroczystości)
+            MARGINS margins = new MARGINS
+            {
+                cxLeftWidth = -1,
+                cxRightWidth = -1,
+                cyTopHeight = -1,
+                cyBottomHeight = -1
+            };
+            DwmExtendFrameIntoClientArea(hwnd, ref margins);
+        }
+
+        // Umożliwia przeciąganie okna za dowolny element
+        protected void DragWindow(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == System.Windows.Input.MouseButton.Left)
+                this.DragMove();
+        }
+    }
+}
