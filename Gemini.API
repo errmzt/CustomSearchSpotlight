@@ -1,0 +1,20 @@
+public async Task<string> AskQuestionAsync(string question)
+{
+    try
+    {
+        Console.WriteLine($"Sending to Gemini: {question}");
+        
+        // Test bez API - zwróć mock odpowiedź
+        await Task.Delay(1000); // Symulacja opóźnienia
+        
+        return $"Mock odpowiedź na: '{question}'\n\n" +
+               "To jest testowa odpowiedź. Aby użyć prawdziwego Gemini AI:\n" +
+               "1. Zdobądź klucz API z: https://makersuite.google.com/app/apikey\n" +
+               "2. Wklej go do appsettings.json\n" +
+               "3. Odkomentuj prawdziwy kod API w GeminiService.cs";
+    }
+    catch (Exception ex)
+    {
+        return $"Błąd: {ex.Message}";
+    }
+}
