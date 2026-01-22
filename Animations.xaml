@@ -1,0 +1,108 @@
+<!-- Animations.xaml -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <!-- Apple-style Blue Gradient Colors -->
+    <Color x:Key="AppleBlueLight">#007AFF</Color>
+    <Color x:Key="AppleBlueMedium">#0A84FF</Color>
+    <Color x:Key="AppleBlueDark">#0056D6</Color>
+    
+    <!-- SEARCHING ANIMATION - Pulsing Gradient -->
+    <Storyboard x:Key="SearchingAnimation" RepeatBehavior="Forever">
+        <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Border.Background).(LinearGradientBrush.GradientStops)[1].(GradientStop.Color)">
+            <LinearColorKeyFrame KeyTime="0:0:0" Value="#007AFF"/>
+            <LinearColorKeyFrame KeyTime="0:0:0.5" Value="#0A84FF"/>
+            <LinearColorKeyFrame KeyTime="0:0:1" Value="#007AFF"/>
+        </ColorAnimationUsingKeyFrames>
+        
+        <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Border.Background).(LinearGradientBrush.GradientStops)[2].(GradientStop.Color)">
+            <LinearColorKeyFrame KeyTime="0:0:0" Value="#0A84FF"/>
+            <LinearColorKeyFrame KeyTime="0:0:0.5" Value="#0056D6"/>
+            <LinearColorKeyFrame KeyTime="0:0:1" Value="#0A84FF"/>
+        </ColorAnimationUsingKeyFrames>
+        
+        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)">
+            <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0.7"/>
+            <LinearDoubleKeyFrame KeyTime="0:0:0.5" Value="1.0"/>
+            <LinearDoubleKeyFrame KeyTime="0:0:1" Value="0.7"/>
+        </DoubleAnimationUsingKeyFrames>
+    </Storyboard>
+    
+    <!-- VOICE SPEAKING ANIMATION - Wave Effect -->
+    <Storyboard x:Key="VoiceSpeakingAnimation" RepeatBehavior="Forever">
+        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="VoiceWave1" 
+                                       Storyboard.TargetProperty="Height">
+            <LinearDoubleKeyFrame KeyTime="0:0:0" Value="4"/>
+            <LinearDoubleKeyFrame KeyTime="0:0:0.2" Value="12"/>
+            <LinearDoubleKeyFrame KeyTime="0:0:0.4" Value="4"/>
+        </DoubleAnimationUsingKeyFrames>
+        
+        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="VoiceWave2" 
+                                       Storyboard.TargetProperty="Height">
+            <LinearDoubleKeyFrame KeyTime="0:0:0.1" Value="4"/>
+            <LinearDoubleKeyFrame KeyTime="0:0:0.3" Value="16"/>
+            <LinearDoubleKeyFrame KeyTime="0:0:0.5" Value="4"/>
+        </DoubleAnimationUsingKeyFrames>
+        
+        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="VoiceWave3" 
+                                       Storyboard.TargetProperty="Height">
+            <LinearDoubleKeyFrame KeyTime="0:0:0.2" Value="4"/>
+            <LinearDoubleKeyFrame KeyTime="0:0:0.4" Value="20"/>
+            <LinearDoubleKeyFrame KeyTime="0:0:0.6" Value="4"/>
+        </DoubleAnimationUsingKeyFrames>
+    </Storyboard>
+    
+    <!-- WINDOW APPEAR ANIMATION -->
+    <Storyboard x:Key="WindowAppearAnimation">
+        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                         From="0" To="1" Duration="0:0:0.3"/>
+        
+        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
+                         From="0.9" To="1" Duration="0:0:0.4">
+            <DoubleAnimation.EasingFunction>
+                <ElasticEase EasingMode="EaseOut" Oscillations="1"/>
+            </DoubleAnimation.EasingFunction>
+        </DoubleAnimation>
+        
+        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY"
+                         From="0.9" To="1" Duration="0:0:0.4">
+            <DoubleAnimation.EasingFunction>
+                <ElasticEase EasingMode="EaseOut" Oscillations="1"/>
+            </DoubleAnimation.EasingFunction>
+        </DoubleAnimation>
+    </Storyboard>
+    
+    <!-- BUTTON PRESS ANIMATION -->
+    <Storyboard x:Key="ButtonPressAnimation">
+        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
+                         To="0.95" Duration="0:0:0.1"/>
+        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY"
+                         To="0.95" Duration="0:0:0.1"/>
+    </Storyboard>
+    
+    <Storyboard x:Key="ButtonReleaseAnimation">
+        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
+                         To="1" Duration="0:0:0.2">
+            <DoubleAnimation.EasingFunction>
+                <ElasticEase EasingMode="EaseOut" Oscillations="2"/>
+            </DoubleAnimation.EasingFunction>
+        </DoubleAnimation>
+        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY"
+                         To="1" Duration="0:0:0.2">
+            <DoubleAnimation.EasingFunction>
+                <ElasticEase EasingMode="EaseOut" Oscillations="2"/>
+            </DoubleAnimation.EasingFunction>
+        </DoubleAnimation>
+    </Storyboard>
+    
+    <!-- GLITCH EFFECT (for errors) -->
+    <Storyboard x:Key="GlitchEffect">
+        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="RenderTransform.TranslateX">
+            <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+            <LinearDoubleKeyFrame KeyTime="0:0:0.05" Value="-2"/>
+            <LinearDoubleKeyFrame KeyTime="0:0:0.1" Value="2"/>
+            <LinearDoubleKeyFrame KeyTime="0:0:0.15" Value="0"/>
+        </DoubleAnimationUsingKeyFrames>
+    </Storyboard>
+    
+</ResourceDictionary>
