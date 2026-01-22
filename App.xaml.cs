@@ -74,3 +74,60 @@ public static class WindowExtensions
         return new System.Windows.Interop.WindowInteropHelper(window).Handle;
     }
 }
+using CustomSearchApp.Services;
+using System;
+using System.Windows;
+
+namespace CustomSearchApp
+{
+    public partial class App : Application
+    {
+        private HotkeyManager _hotkeyManager;
+        private MainWindow _mainWindow;
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+
+            // Utwórz i ukryj główne okno
+            _mainWindow = new MainWindow();
+            _mainWindow.Hide();
+
+            // Zainicjuj i zarejestruj hotkey
+            _hotkeyManager = new HotkeyManager();
+            try
+            {
+                _hotkeyManager.Register(_mainWindow.GetWindowHandle());
+                _hotkeyManager.HotkeyPressed += () =>
+                {
+                    _mainWindow.Dispatcher.Invoke(() =>
+                    {
+                        if (_mainWindow.IsVisible)
+                        {
+                            _mainWindow.Hide();
+                        }
+                        else
+                        {
+                            _mainWindow.Show();
+                            _mainWindow.Activate();
+                            _mainWindow.SearchBox.Focus();
+                        }
+                    });
+                };
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Błąd hotkey: {ex.Message}\nZmieniam na Ctrl+Shift+Space", 
+                    "Ostrzeżenie", MessageBoxButton.OK, MessageBoxImage.Warning);
+                // Tutaj można zmienić na inny skrót
+            }
+
+            // Posprzątaj przy zamknięciu
+            _mainWindow.Closed += (s, args) => 
+            {
+                _hotkeyManager?.Dispose();
+                Current.Shutdown();
+            };
+        }
+    }
+}
