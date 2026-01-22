@@ -207,3 +207,30 @@ namespace CustomSearchApp
         }
     }
 }
+public class MainViewModel : INotifyPropertyChanged
+{
+    private readonly WindowsSearchService _windowsSearchService;
+    private readonly FileSearchService _fileSearchService;
+    
+    public MainViewModel()
+    {
+        _windowsSearchService = new WindowsSearchService();
+        _fileSearchService = new FileSearchService();
+        
+        // ... reszta inicjalizacji
+    }
+    
+    private async Task<List<FileSearchResult>> SearchFiles(string query, int maxResults = 20)
+    {
+        // Najpierw próbuj Windows Search API
+        var results = await _windowsSearchService.SearchFilesAsync(query, maxResults);
+        
+        // Jeśli brak wyników, użyj fallback
+        if (results.Count == 0)
+            results = await _fileSearchService.SearchFilesAsync(query, maxResults);
+        
+        return results;
+    }
+    
+    // ... reszta kodu
+}
