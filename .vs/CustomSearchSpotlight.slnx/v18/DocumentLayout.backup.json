@@ -1,0 +1,245 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\scripts\\gh-pr.sh||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:scripts\\gh-pr.sh||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\scripts\\git-push-feature.sh||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:scripts\\git-push-feature.sh||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\scripts\\patch-apply.sh||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:scripts\\patch-apply.sh||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\MainWindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:MainWindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\MainWindow.xaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:MainWindow.xaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\MainViewModel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:MainViewModel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\src\\CustomSearch.App\\appsettings.json.example||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\CustomSearch.App\\appsettings.json.example||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\src\\CustomSearch.App\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\CustomSearch.App\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\patch 0001-restructure.patch||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:patch 0001-restructure.patch||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\.github\\workflows\\build.yml||{06C066C6-04A2-4E5D-8202-439FD4234EF1}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:.github\\workflows\\build.yml||{06C066C6-04A2-4E5D-8202-439FD4234EF1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\docs\\setup.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:docs\\setup.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\gitignore .gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:gitignore .gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\.github\\copilot-instructions.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:.github\\copilot-instructions.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "copilot-instructions.md",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\.github\\copilot-instructions.md",
+              "RelativeDocumentMoniker": ".github\\copilot-instructions.md",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\.github\\copilot-instructions.md",
+              "RelativeToolTip": ".github\\copilot-instructions.md",
+              "ViewState": "AgIAABAAAAAAAAAAAIBJwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2026-01-22T01:11:37.759Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "gh-pr.sh",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\scripts\\gh-pr.sh",
+              "RelativeDocumentMoniker": "scripts\\gh-pr.sh",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\scripts\\gh-pr.sh",
+              "RelativeToolTip": "scripts\\gh-pr.sh",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-01-22T01:11:11.171Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "git-push-feature.sh",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\scripts\\git-push-feature.sh",
+              "RelativeDocumentMoniker": "scripts\\git-push-feature.sh",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\scripts\\git-push-feature.sh",
+              "RelativeToolTip": "scripts\\git-push-feature.sh",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-01-22T01:08:43.464Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "patch-apply.sh",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\scripts\\patch-apply.sh",
+              "RelativeDocumentMoniker": "scripts\\patch-apply.sh",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\scripts\\patch-apply.sh",
+              "RelativeToolTip": "scripts\\patch-apply.sh",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-01-22T01:08:21.033Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "MainWindow.xaml.cs",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\MainWindow.xaml.cs",
+              "RelativeToolTip": "MainWindow.xaml.cs",
+              "ViewState": "AgIAAEUAAAAAAAAAAAAMwAwAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-22T00:47:59.02Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MainWindow.xaml",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\MainWindow.xaml",
+              "RelativeDocumentMoniker": "MainWindow.xaml",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\MainWindow.xaml",
+              "RelativeToolTip": "MainWindow.xaml",
+              "ViewState": "AgIAABgAAAAAAAAAAAAhwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-01-22T00:49:12.3Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\src\\CustomSearch.App\\appsettings.json",
+              "RelativeDocumentMoniker": "src\\CustomSearch.App\\appsettings.json",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\src\\CustomSearch.App\\appsettings.json",
+              "RelativeToolTip": "src\\CustomSearch.App\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-01-22T00:46:16.618Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "patch 0001-restructure.patch",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\patch 0001-restructure.patch",
+              "RelativeDocumentMoniker": "patch 0001-restructure.patch",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\patch 0001-restructure.patch",
+              "RelativeToolTip": "patch 0001-restructure.patch",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-01-22T00:41:54.826Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "MainViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\MainViewModel.cs",
+              "RelativeDocumentMoniker": "MainViewModel.cs",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\MainViewModel.cs",
+              "RelativeToolTip": "MainViewModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-22T00:35:36.005Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "build.yml",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\.github\\workflows\\build.yml",
+              "RelativeDocumentMoniker": ".github\\workflows\\build.yml",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\.github\\workflows\\build.yml",
+              "RelativeToolTip": ".github\\workflows\\build.yml",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003775|",
+              "WhenOpened": "2026-01-22T00:29:54.055Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "setup.md",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\docs\\setup.md",
+              "RelativeDocumentMoniker": "docs\\setup.md",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\docs\\setup.md",
+              "RelativeToolTip": "docs\\setup.md",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2026-01-22T00:29:25.353Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "gitignore .gitignore",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\gitignore .gitignore",
+              "RelativeDocumentMoniker": "gitignore .gitignore",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\gitignore .gitignore",
+              "RelativeToolTip": "gitignore .gitignore",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-01-22T00:29:07.571Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "appsettings.json.example",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\src\\CustomSearch.App\\appsettings.json.example",
+              "RelativeDocumentMoniker": "src\\CustomSearch.App\\appsettings.json.example",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\errmzt\\CustomSearchSpotlight\\src\\CustomSearch.App\\appsettings.json.example",
+              "RelativeToolTip": "src\\CustomSearch.App\\appsettings.json.example",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-01-22T00:28:11.124Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

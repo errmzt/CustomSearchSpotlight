@@ -1,0 +1,18 @@
+﻿# Copilot Instructions
+
+## General Guidelines
+- First general instruction
+- Second general instruction
+
+## Code Style
+- Use specific formatting rules
+- Follow naming conventions
+
+## Project-Specific Rules
+- Custom requirement A
+- Custom requirement B
+
+## Repository Information
+- Local repository: C:\Users\User\source\repos\errmzt\CustomSearchSpotlight
+- Branch: main
+- Remote origin: [https://github.com/errmzt/CustomSearchSpotlight](https://github.com/errmzt/CustomSearchSpotlight)
