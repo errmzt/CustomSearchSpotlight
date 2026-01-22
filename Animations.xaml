@@ -106,3 +106,34 @@
     </Storyboard>
     
 </ResourceDictionary>
+<!-- Dodaj do Animations.xaml -->
+<Style x:Key="GlassContainer" TargetType="Border">
+    <Setter Property="Background">
+        <Setter.Value>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#1A1A2ECC" Offset="0"/>
+                <GradientStop Color="#16213ECC" Offset="0.3"/>
+                <GradientStop Color="#0F3460CC" Offset="0.7"/>
+                <GradientStop Color="#1A1A2ECC" Offset="1"/>
+            </LinearGradientBrush>
+        </Setter.Value>
+    </Setter>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="BorderBrush">
+        <Setter.Value>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                <GradientStop Color="#40FFFFFF" Offset="0"/>
+                <GradientStop Color="#80FFFFFF" Offset="0.5"/>
+                <GradientStop Color="#40FFFFFF" Offset="1"/>
+            </LinearGradientBrush>
+        </Setter.Value>
+    </Setter>
+    <Setter Property="Effect">
+        <Setter.Value>
+            <DropShadowEffect BlurRadius="40" 
+                              Opacity="0.5" 
+                              ShadowDepth="0"
+                              Color="#007AFF"/>
+        </Setter.Value>
+    </Setter>
+</Style>
