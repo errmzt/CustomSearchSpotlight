@@ -106,3 +106,8 @@ public class TrayIconManager : IDisposable
         _trayIcon?.Dispose();
     }
 }
+<Window x:Class="CustomSearchApp.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Zawartość okna -->
+</Window>
