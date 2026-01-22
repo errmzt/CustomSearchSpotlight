@@ -1,223 +1,103 @@
 using System;
-using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Interop;
+using System.Runtime.InteropServices;
 
 namespace CustomSearchApp
 {
     public partial class MainWindow : Window
     {
+        [DllImport("user32.dll")]
+        private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
+        
+        [DllImport("user32.dll")]
+        private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+        
+        private const int HOTKEY_ID = 1;
+        private IntPtr _windowHandle;
+        
         public MainWindow()
         {
             InitializeComponent();
-            SetupWindow();
         }
-
-        private void SetupWindow()
-        {
-            // Ustaw pozycję (wyśrodkowane)
-            WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            
-            // Obsługa klawiszy
-            PreviewKeyDown += MainWindow_PreviewKeyDown;
-            
-            // Auto-hide przy straceniu focusu
-            Deactivated += (s, e) => Hide();
-        }
-
+        
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            // Wymuś acrylic efekt po załadowaniu
-            EnableAcrylicBlur();
+            // Get window handle for hotkey
+            _windowHandle = new WindowInteropHelper(this).Handle;
+            
+            // Register Alt+Space hotkey
+            RegisterHotKey(_windowHandle, HOTKEY_ID, 0x0001, 0x20); // MOD_ALT, VK_SPACE
+            
+            // Setup window hook for hotkey messages
+            var source = HwndSource.FromHwnd(_windowHandle);
+            source?.AddHook(HwndHook);
+            
+            StatusText.Text = "Status: Uruchomiony (Alt+Space)";
         }
-
-        private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            // ESC zamyka okno
-            if (e.Key == Key.Escape)
-            {
-                Hide();
-            }
-        }
-
-        // ============================
-        // GLASS/ACRYLIC EFFECT - MAGIA!
-        // ============================
         
-        [DllImport("user32.dll")]
-        internal static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);
-
-        private void EnableAcrylicBlur()
+        private IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            try
+            const int WM_HOTKEY = 0x0312;
+            
+            if (msg == WM_HOTKEY && wParam.ToInt32() == HOTKEY_ID)
             {
-                var windowHelper = new WindowInteropHelper(this);
-                var accent = new AccentPolicy();
-                
-                // Ustawienie acrylic blur
-                accent.AccentState = AccentState.ACCENT_ENABLE_ACRYLICBLURBEHIND;
-                accent.GradientColor = 0x99000000; // Kolor z alpha: #99000000
-                
-                var accentStructSize = Marshal.SizeOf(accent);
-                var accentPtr = Marshal.AllocHGlobal(accentStructSize);
-                Marshal.StructureToPtr(accent, accentPtr, false);
-                
-                var data = new WindowCompositionAttributeData();
-                data.Attribute = WindowCompositionAttribute.WCA_ACCENT_POLICY;
-                data.SizeOfData = accentStructSize;
-                data.Data = accentPtr;
-                
-                SetWindowCompositionAttribute(windowHelper.Handle, ref data);
-                
-                Marshal.FreeHGlobal(accentPtr);
+                // Toggle window visibility
+                if (Visibility == Visibility.Visible)
+                {
+                    Hide();
+                }
+                else
+                {
+                    Show();
+                    Activate();
+                    Topmost = true;
+                }
+                handled = true;
             }
-            catch (Exception ex)
-            {
-                // Jeśli acrylic nie działa, pokaż komunikat
-                SearchBox.Text = $"Glass efekt: {ex.Message}";
-            }
+            return IntPtr.Zero;
         }
-
-        // Struktury dla Win32 API
-        internal enum AccentState
-        {
-            ACCENT_ENABLE_ACRYLICBLURBEHIND = 4
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct AccentPolicy
-        {
-            public AccentState AccentState;
-            public int AccentFlags;
-            public int GradientColor;
-            public int AnimationId;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct WindowCompositionAttributeData
-        {
-            public WindowCompositionAttribute Attribute;
-            public IntPtr Data;
-            public int SizeOfData;
-        }
-
-        internal enum WindowCompositionAttribute
-        {
-            WCA_ACCENT_POLICY = 19
-        }
-    }
-}
-public partial class MainWindow : GlassWindow
-{
-    private HotkeyManager _hotkeyManager;
-    private GeminiService _geminiService;
-    private VoiceService _voiceService;
-    private bool _isVoiceActive;
-    
-    public MainWindow()
-    {
-        InitializeComponent();
-        SetupHotkey();
-        SetupGemini();
-        SetupVoice();
-    }
-    
-    private void SetupVoice()
-    {
-        _voiceService = new VoiceService();
-        _voiceService.SpeechRecognized += VoiceService_SpeechRecognized;
-        _voiceService.ListeningStarted += VoiceService_ListeningStarted;
-        _voiceService.ListeningStopped += VoiceService_ListeningStopped;
         
-        // Start listening in background
-        _voiceService.StartListening();
-        _isVoiceActive = true;
-    }
-    
-    private void VoiceService_SpeechRecognized(object sender, string text)
-    {
-        // Update UI from voice thread
-        Dispatcher.Invoke(() =>
+        private void TestHotkey_Click(object sender, RoutedEventArgs e)
         {
-            StatusText.Text = $"🎤: {text}";
-            
-            // If it's a question, send to AI
-            if (text.EndsWith("?") || text.Contains("jak") || text.Contains("co to") || 
-                text.Contains("czy") || text.Contains("dlaczego"))
-            {
-                SearchBox.Text = text;
-                _ = AskGeminiAsync(text);
-            }
-        });
-    }
-    
-    private void VoiceService_ListeningStarted(object sender, string message)
-    {
-        Dispatcher.Invoke(() =>
-        {
-            VoiceButton.Content = "🔴";
-            VoiceButton.ToolTip = "Nasłuchiwanie włączone";
-        });
-    }
-    
-    private void VoiceService_ListeningStopped(object sender, EventArgs e)
-    {
-        Dispatcher.Invoke(() =>
-        {
-            VoiceButton.Content = "🎤";
-            VoiceButton.ToolTip = "Nasłuchiwanie wyłączone";
-        });
-    }
-    
-    private void VoiceButton_Click(object sender, RoutedEventArgs e)
-    {
-        _isVoiceActive = !_isVoiceActive;
+            MessageBox.Show("Hotkey zarejestrowany!\nNaciśnij Alt+Space by pokazać/ukryć okno.");
+        }
         
-        if (_isVoiceActive)
+        private void TestGlass_Click(object sender, RoutedEventArgs e)
         {
-            _voiceService.StartListening();
-            _voiceService.Speak("Asystent głosowy włączony");
+            // Change opacity to show glass effect
+            this.Opacity = this.Opacity == 1.0 ? 0.9 : 1.0;
+            StatusText.Text = $"Status: Przezroczystość: {this.Opacity * 100}%";
         }
-        else
+        
+        private void TestAI_Click(object sender, RoutedEventArgs e)
         {
-            _voiceService.StopListening();
-            _voiceService.Speak("Asystent głosowy wyłączony");
+            StatusText.Text = "Status: AI Mock Response...";
+            
+            // Simulate AI response
+            MessageBox.Show("🤖 Gemini AI Mock Response:\n\n" +
+                          "Cześć! To jest testowa odpowiedź AI.\n\n" +
+                          "Aby użyć prawdziwego Gemini:\n" +
+                          "1. Zdobądź klucz API z Google AI Studio\n" +
+                          "2. Dodaj go do appsettings.json\n" +
+                          "3. Uruchom pełną wersję aplikacji");
+            
+            StatusText.Text = "Status: Gotowy";
         }
-    }
-    
-    private async Task AskGeminiAsync(string question)
-    {
-        try
+        
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            StatusText.Text = "🤔 Gemini myśli...";
-            AiResponseBox.Visibility = Visibility.Visible;
-            AiResponseText.Text = "Proszę czekać...";
-            
-            var response = await _geminiService.AskQuestionAsync(question);
-            
-            AiResponseText.Text = response;
-            StatusText.Text = "✅ Odpowiedź otrzymana";
-            
-            // Speak the response
-            if (_isVoiceActive)
+            Close();
+        }
+        
+        protected override void OnClosed(EventArgs e)
+        {
+            // Cleanup hotkey
+            if (_windowHandle != IntPtr.Zero)
             {
-                // Truncate long responses for speech
-                var speechText = response.Length > 200 ? 
-                    response.Substring(0, 200) + "..." : response;
-                _voiceService.Speak(speechText);
+                UnregisterHotKey(_windowHandle, HOTKEY_ID);
             }
+            base.OnClosed(e);
         }
-        catch (Exception ex)
-        {
-            AiResponseText.Text = $"Błąd: {ex.Message}";
-            StatusText.Text = "❌ Wystąpił błąd";
-        }
-    }
-    
-    protected override void OnClosed(EventArgs e)
-    {
-        _voiceService?.Dispose();
-        base.OnClosed(e);
     }
 }
