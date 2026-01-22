@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
-namespace CustomSearchApp
+namespace CustomSearchSpotlight
 {
     public class FileSearchResult
     {
@@ -15,7 +13,7 @@ namespace CustomSearchApp
         public string Type { get; set; }
         public DateTime Modified { get; set; }
         public long Size { get; set; }
-        public ImageSource Icon { get; set; }
+        public string Icon { get; set; }
         
         public string Description => $"{Type} • {GetSizeString()} • {Modified:dd.MM.yyyy}";
         
@@ -26,202 +24,116 @@ namespace CustomSearchApp
             return $"{Size / (1024 * 1024)} MB";
         }
     }
-    
+
     public class FileSearchService
     {
-        private readonly List<string> _searchPaths;
-        private readonly HashSet<string> _allowedExtensions;
-        
-        public FileSearchService()
+        private readonly List<string> _searchPaths = new List<string>
         {
-            // Common search locations
-            _searchPaths = new List<string>
-            {
-                Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                Environment.GetFolderPath(Environment.SpecialFolder.MyMusic),
-                Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
-                Environment.GetFolderPath(Environment.SpecialFolder.MyVideos),
-                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
-            };
-            
-            // Common file extensions
-            _allowedExtensions = new HashSet<string>
-            {
-                ".txt", ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx",
-                ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".mp3", ".mp4", ".avi",
-                ".zip", ".rar", ".exe", ".lnk", ".url"
-            };
-        }
-        
-        public async Task<List<FileSearchResult>> SearchFilesAsync(string query, int maxResults = 20)
+            Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+            Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+            Environment.GetFolderPath(Environment.SpecialFolder.MyMusic),
+            Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
+            Environment.GetFolderPath(Environment.SpecialFolder.MyVideos),
+            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads")
+        };
+
+        private readonly Dictionary<string, string> _fileTypeIcons = new Dictionary<string, string>
+        {
+            { ".txt", "📄" }, { ".doc", "📝" }, { ".docx", "📝" },
+            { ".pdf", "📕" }, { ".xls", "📊" }, { ".xlsx", "📊" },
+            { ".jpg", "🖼️" }, { ".png", "🖼️" }, { ".gif", "🖼️" },
+            { ".mp3", "🎵" }, { ".mp4", "🎬" }, { ".avi", "🎬" },
+            { ".zip", "📦" }, { ".rar", "📦" }, { ".exe", "⚙️" },
+            { ".lnk", "🔗" }
+        };
+
+        public async Task<List<FileSearchResult>> SearchAsync(string query, int maxResults = 20)
         {
             return await Task.Run(() => SearchFiles(query, maxResults));
         }
-        
+
         private List<FileSearchResult> SearchFiles(string query, int maxResults)
         {
             var results = new List<FileSearchResult>();
             var queryLower = query.ToLower();
-            
+
             foreach (var searchPath in _searchPaths)
             {
                 if (!Directory.Exists(searchPath)) continue;
-                
+
                 try
                 {
-                    // Search in current directory
-                    SearchDirectory(searchPath, queryLower, results, maxResults);
-                    
-                    // Search in subdirectories (limited depth)
-                    if (results.Count < maxResults)
-                    {
-                        SearchSubdirectories(searchPath, queryLower, results, maxResults, 2);
-                    }
+                    SearchInDirectory(searchPath, queryLower, results, maxResults);
+                    if (results.Count >= maxResults) break;
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Search error in {searchPath}: {ex.Message}");
-                }
-                
-                if (results.Count >= maxResults) break;
+                catch (UnauthorizedAccessException) { }
+                catch (PathTooLongException) { }
+                catch (Exception) { }
             }
-            
-            // Sort by relevance
-            return results
-                .OrderByDescending(f => GetRelevanceScore(f, queryLower))
-                .ThenByDescending(f => f.Modified)
-                .Take(maxResults)
-                .ToList();
+
+            return results.Take(maxResults).ToList();
         }
-        
-        private void SearchDirectory(string directory, string query, 
-            List<FileSearchResult> results, int maxResults)
+
+        private void SearchInDirectory(string directory, string query, List<FileSearchResult> results, int maxResults)
         {
             try
             {
                 // Search files
-                foreach (var file in Directory.GetFiles(directory))
+                foreach (var file in Directory.EnumerateFiles(directory, "*", SearchOption.TopDirectoryOnly))
                 {
                     if (results.Count >= maxResults) return;
-                    
+
                     var fileName = Path.GetFileName(file);
                     if (fileName.ToLower().Contains(query))
                     {
-                        results.Add(CreateFileResult(file));
+                        var fileInfo = new FileInfo(file);
+                        var extension = Path.GetExtension(file).ToLower();
+
+                        results.Add(new FileSearchResult
+                        {
+                            Name = fileName,
+                            Path = file,
+                            Type = GetFileType(extension),
+                            Modified = fileInfo.LastWriteTime,
+                            Size = fileInfo.Length,
+                            Icon = GetFileIcon(extension)
+                        });
                     }
                 }
             }
-            catch { /* Ignore access errors */ }
+            catch { }
         }
-        
-        private void SearchSubdirectories(string directory, string query, 
-            List<FileSearchResult> results, int maxResults, int maxDepth, int currentDepth = 0)
-        {
-            if (currentDepth >= maxDepth) return;
-            
-            try
-            {
-                foreach (var subDir in Directory.GetDirectories(directory))
-                {
-                    if (results.Count >= maxResults) return;
-                    
-                    SearchDirectory(subDir, query, results, maxResults);
-                    
-                    if (results.Count < maxResults)
-                    {
-                        SearchSubdirectories(subDir, query, results, maxResults, 
-                            maxDepth, currentDepth + 1);
-                    }
-                }
-            }
-            catch { /* Ignore access errors */ }
-        }
-        
-        private FileSearchResult CreateFileResult(string filePath)
-        {
-            var fileInfo = new FileInfo(filePath);
-            var extension = Path.GetExtension(filePath).ToLower();
-            
-            return new FileSearchResult
-            {
-                Name = Path.GetFileName(filePath),
-                Path = filePath,
-                Type = GetFileType(extension),
-                Modified = fileInfo.LastWriteTime,
-                Size = fileInfo.Length,
-                Icon = GetFileIcon(extension)
-            };
-        }
-        
+
         private string GetFileType(string extension)
         {
             return extension switch
             {
-                ".txt" => "Text Document",
-                ".pdf" => "PDF Document",
+                ".txt" => "Text File",
                 ".doc" or ".docx" => "Word Document",
-                ".xls" or ".xlsx" => "Excel Document",
+                ".pdf" => "PDF Document",
+                ".xls" or ".xlsx" => "Excel Spreadsheet",
                 ".jpg" or ".jpeg" or ".png" or ".gif" or ".bmp" => "Image",
                 ".mp3" or ".wav" or ".flac" => "Audio",
-                ".mp4" or ".avi" or ".mkv" => "Video",
-                ".exe" => "Application",
-                ".lnk" => "Shortcut",
+                ".mp4" or ".avi" or ".mkv" or ".mov" => "Video",
                 ".zip" or ".rar" or ".7z" => "Archive",
+                ".exe" or ".msi" => "Application",
+                ".lnk" => "Shortcut",
                 _ => "File"
             };
         }
-        
-        private ImageSource GetFileIcon(string extension)
+
+        private string GetFileIcon(string extension)
         {
-            // Simple icon based on file type
-            var iconPath = extension switch
-            {
-                ".txt" => "📄",
-                ".pdf" => "📕",
-                ".doc" or ".docx" => "📘",
-                ".xls" or ".xlsx" => "📗",
-                ".jpg" or ".jpeg" or ".png" or ".gif" or ".bmp" => "🖼️",
-                ".mp3" or ".wav" => "🎵",
-                ".mp4" or ".avi" => "🎬",
-                ".exe" => "⚙️",
-                ".lnk" => "🔗",
-                ".zip" or ".rar" => "📦",
-                _ => "📄"
-            };
-            
-            // In real app, you'd use System.Drawing.Icon or WPF's Icon
-            return null; // Return null for text icon for now
+            return _fileTypeIcons.ContainsKey(extension) ? _fileTypeIcons[extension] : "📄";
         }
-        
-        private int GetRelevanceScore(FileSearchResult file, string query)
-        {
-            var score = 0;
-            var nameLower = file.Name.ToLower();
-            
-            // Exact match gets highest score
-            if (nameLower == query) score += 100;
-            
-            // Starts with query
-            if (nameLower.StartsWith(query)) score += 50;
-            
-            // Contains query
-            if (nameLower.Contains(query)) score += 25;
-            
-            // Recent files get bonus
-            var daysOld = (DateTime.Now - file.Modified).TotalDays;
-            if (daysOld < 7) score += 20;
-            else if (daysOld < 30) score += 10;
-            
-            return score;
-        }
-        
-        public List<string> GetQuickAccessLocations()
+
+        public List<string> GetCommonSearchLocations()
         {
             return new List<string>
             {
                 "Desktop",
-                "Documents",
+                "Documents", 
                 "Downloads",
                 "Pictures",
                 "Music",
