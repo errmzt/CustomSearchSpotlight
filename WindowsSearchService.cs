@@ -194,3 +194,135 @@ public class WindowsSearchService
         return results;
     }
 }
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace CustomSearchApp.Services
+{
+    public class WindowsSearchService
+    {
+        public enum SearchResultType
+        {
+            File,
+            Application,
+            Folder
+        }
+
+        public class SearchResult
+        {
+            public string Title { get; set; }
+            public string Path { get; set; }
+            public SearchResultType Type { get; set; }
+            public string Icon { get; set; }
+        }
+
+        public async Task<List<SearchResult>> SearchAsync(string query, int maxResults = 20)
+        {
+            return await Task.Run(() =>
+            {
+                var results = new List<SearchResult>();
+                
+                if (string.IsNullOrWhiteSpace(query))
+                    return results;
+
+                query = query.ToLower();
+                
+                // Wyszukiwanie aplikacji w menu Start
+                SearchApplications(query, results, maxResults);
+                
+                // Wyszukiwanie plików w głównych folderach użytkownika
+                SearchUserFiles(query, results, maxResults);
+                
+                return results.Take(maxResults).ToList();
+            });
+        }
+
+        private void SearchApplications(string query, List<SearchResult> results, int maxResults)
+        {
+            try
+            {
+                string startMenuPath = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.StartMenu),
+                    "Programs");
+                
+                string commonStartMenuPath = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu),
+                    "Programs");
+
+                SearchInDirectory(startMenuPath, query, results, SearchResultType.Application, "📱");
+                SearchInDirectory(commonStartMenuPath, query, results, SearchResultType.Application, "📱");
+            }
+            catch { /* Ignoruj błędy dostępu */ }
+        }
+
+        private void SearchUserFiles(string query, List<SearchResult> results, int maxResults)
+        {
+            try
+            {
+                string[] searchDirectories = {
+                    Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyMusic),
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyVideos),
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
+                };
+
+                foreach (var directory in searchDirectories)
+                {
+                    if (Directory.Exists(directory))
+                    {
+                        SearchInDirectory(directory, query, results, SearchResultType.File, "📄");
+                        
+                        if (results.Count >= maxResults)
+                            break;
+                    }
+                }
+            }
+            catch { /* Ignoruj błędy dostępu */ }
+        }
+
+        private void SearchInDirectory(string directory, string query, List<SearchResult> results, 
+                                     SearchResultType type, string icon)
+        {
+            try
+            {
+                // Wyszukiwanie plików
+                var files = Directory.EnumerateFiles(directory, "*", SearchOption.TopDirectoryOnly)
+                    .Where(f => Path.GetFileName(f).ToLower().Contains(query))
+                    .Take(10);
+
+                foreach (var file in files)
+                {
+                    results.Add(new SearchResult
+                    {
+                        Title = Path.GetFileName(file),
+                        Path = file,
+                        Type = type,
+                        Icon = icon
+                    });
+                }
+
+                // Wyszukiwanie folderów
+                var directories = Directory.EnumerateDirectories(directory, "*", SearchOption.TopDirectoryOnly)
+                    .Where(d => Path.GetFileName(d).ToLower().Contains(query))
+                    .Take(5);
+
+                foreach (var dir in directories)
+                {
+                    results.Add(new SearchResult
+                    {
+                        Title = Path.GetFileName(dir),
+                        Path = dir,
+                        Type = SearchResultType.Folder,
+                        Icon = "📁"
+                    });
+                }
+            }
+            catch { /* Ignoruj błędy dostępu do pojedynczego folderu */ }
+        }
+    }
+}
