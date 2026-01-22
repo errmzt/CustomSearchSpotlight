@@ -130,3 +130,4 @@ namespace CustomSearchApp
         }
     }
 }
+xmlns:local="clr-namespace:CustomSearchApp.Windows"
