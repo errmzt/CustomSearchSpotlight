@@ -183,3 +183,23 @@
         </Grid>
     </Border>
 </local:GlassWindow>
+<!-- W MainWindow.xaml dodaj: -->
+<Border Grid.Row="0" Height="40" Background="Transparent" 
+        MouseDown="TitleBar_MouseDown">
+    <Grid>
+        <TextBlock Text="🔍 Custom Search" 
+                   Foreground="White" 
+                   FontSize="14"
+                   VerticalAlignment="Center"
+                   Margin="20,0"/>
+        
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="🗕" Style="{StaticResource TitleBarButton}" 
+                    Click="MinimizeButton_Click"/>
+            <Button Content="🗖" Style="{StaticResource TitleBarButton}" 
+                    Click="MaximizeButton_Click"/>
+            <Button Content="✕" Style="{StaticResource TitleBarButton}" 
+                    Click="CloseButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Border>
