@@ -1,89 +1,110 @@
 using System;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
-using CustomSearchSpotlight.ViewModels;
-using System.Runtime.InteropServices;
 
-namespace CustomSearchSpotlight
+namespace CustomSearchApp
 {
     public partial class MainWindow : Window
     {
-        private const int WM_HOTKEY = 0x0312;
-        private const int HOTKEY_ID = 9000;
-
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new MainViewModel();
             SetupWindow();
         }
 
         private void SetupWindow()
         {
-            // Set the window to be transparent and without borders
-            WindowStyle = WindowStyle.None;
-            AllowsTransparency = true;
-            Background = System.Windows.Media.Brushes.Transparent;
-
-            // Set size and position
-            Width = 750;
-            Height = 850;
+            // Ustaw pozycję (wyśrodkowane)
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
-
-            // Register hotkey
-            var hwnd = new WindowInteropHelper(this).Handle;
-            HotkeyManager.RegisterHotKey(hwnd, HOTKEY_ID, 0x0001, 0x20); // Alt+Space
-
-            // Listen for hotkey
-            HwndSource source = HwndSource.FromHwnd(hwnd);
-            source.AddHook(HwndHook);
+            
+            // Obsługa klawiszy
+            PreviewKeyDown += MainWindow_PreviewKeyDown;
+            
+            // Auto-hide przy straceniu focusu
+            Deactivated += (s, e) => Hide();
         }
 
-        private IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (msg == WM_HOTKEY && wParam.ToInt32() == HOTKEY_ID)
-            {
-                // Toggle window visibility
-                if (IsVisible)
-                {
-                    Hide();
-                }
-                else
-                {
-                    Show();
-                    Activate();
-                    Topmost = true;
-                    SearchBox.Focus();
-                }
-                handled = true;
-            }
-            return IntPtr.Zero;
+            // Wymuś acrylic efekt po załadowaniu
+            EnableAcrylicBlur();
         }
 
-        private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            // ESC zamyka okno
             if (e.Key == Key.Escape)
             {
                 Hide();
             }
         }
 
-        protected override void OnClosed(EventArgs e)
+        // ============================
+        // GLASS/ACRYLIC EFFECT - MAGIA!
+        // ============================
+        
+        [DllImport("user32.dll")]
+        internal static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);
+
+        private void EnableAcrylicBlur()
         {
-            // Unregister hotkey
-            var hwnd = new WindowInteropHelper(this).Handle;
-            HotkeyManager.UnregisterHotKey(hwnd, HOTKEY_ID);
-            base.OnClosed(e);
+            try
+            {
+                var windowHelper = new WindowInteropHelper(this);
+                var accent = new AccentPolicy();
+                
+                // Ustawienie acrylic blur
+                accent.AccentState = AccentState.ACCENT_ENABLE_ACRYLICBLURBEHIND;
+                accent.GradientColor = 0x99000000; // Kolor z alpha: #99000000
+                
+                var accentStructSize = Marshal.SizeOf(accent);
+                var accentPtr = Marshal.AllocHGlobal(accentStructSize);
+                Marshal.StructureToPtr(accent, accentPtr, false);
+                
+                var data = new WindowCompositionAttributeData();
+                data.Attribute = WindowCompositionAttribute.WCA_ACCENT_POLICY;
+                data.SizeOfData = accentStructSize;
+                data.Data = accentPtr;
+                
+                SetWindowCompositionAttribute(windowHelper.Handle, ref data);
+                
+                Marshal.FreeHGlobal(accentPtr);
+            }
+            catch (Exception ex)
+            {
+                // Jeśli acrylic nie działa, pokaż komunikat
+                SearchBox.Text = $"Glass efekt: {ex.Message}";
+            }
         }
-    }
 
-    internal static class HotkeyManager
-    {
-        [DllImport("user32.dll")]
-        public static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
+        // Struktury dla Win32 API
+        internal enum AccentState
+        {
+            ACCENT_ENABLE_ACRYLICBLURBEHIND = 4
+        }
 
-        [DllImport("user32.dll")]
-        public static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct AccentPolicy
+        {
+            public AccentState AccentState;
+            public int AccentFlags;
+            public int GradientColor;
+            public int AnimationId;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct WindowCompositionAttributeData
+        {
+            public WindowCompositionAttribute Attribute;
+            public IntPtr Data;
+            public int SizeOfData;
+        }
+
+        internal enum WindowCompositionAttribute
+        {
+            WCA_ACCENT_POLICY = 19
+        }
     }
 }
